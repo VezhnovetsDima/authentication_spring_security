@@ -7,6 +7,7 @@ import com.example.security.mapper.UserMapper
 import com.example.security.repository.UserRepository
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 
@@ -16,7 +17,6 @@ class AuthService(
     private val mapper: UserMapper,
     private val passwordEncoder: PasswordEncoder,
     private val jwtService: JwtService,
-    private val authenticationManager: AuthenticationManager
 ) {
     fun register(user: UserDto): AuthResponseDto {
         val token = jwtService.generateToken(mapOf(), repository.saveAndFlush(mapper.toEntity(user)))
@@ -25,19 +25,17 @@ class AuthService(
     }
 
     fun authenticate(auth: AuthenticationCredentials): AuthResponseDto {
-        authenticationManager.authenticate(
-            UsernamePasswordAuthenticationToken(
-                auth.username,
-                auth.password
+        val user = repository.findByEmail(auth.username ?: throw IllegalArgumentException(""))
+            ?: throw IllegalArgumentException("")
+
+        if (jwtService.decodePassword(user.encryptedPassword) == auth.password) {
+            val token = jwtService.generateToken(
+                mapOf(),
+                user
             )
-        )
-
-        val token = jwtService.generateToken(
-            mapOf(),
-            repository.findByEmail(auth.username ?: throw IllegalArgumentException(""))
-                ?: throw IllegalArgumentException("")
-        )
-
-        return AuthResponseDto(token)
+            return AuthResponseDto(token)
+        } else {
+            throw RuntimeException("wrong password")
+        }
     }
 }
