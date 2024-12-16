@@ -1,5 +1,6 @@
 package com.example.security.controller
 
+import com.example.security.dto.UserWithTokenDto
 import com.example.security.dto.UserDto
 import com.example.security.service.UserService
 import jakarta.servlet.http.HttpServletRequest
@@ -18,7 +19,7 @@ class UserController(
     fun changeCredentials(
         @RequestBody userDto: UserDto,
         request: HttpServletRequest
-    ): UserDto {
+    ): UserWithTokenDto {
         // Extract the JWT token from the Authorization header
         val authorizationHeader = request.getHeader("Authorization")
         val token = if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {

@@ -1,5 +1,6 @@
 package com.example.security.service;
 
+import com.example.security.dto.UserWithTokenDto
 import com.example.security.dto.UserDto
 import com.example.security.mapper.UserMapper
 import com.example.security.repository.UserRepository
@@ -15,7 +16,7 @@ class UserService(
 ) {
 
     @Transactional
-    fun changeCredentials(user: UserDto, token: String): UserDto {
+    fun changeCredentials(user: UserDto, token: String): UserWithTokenDto {
         val userEmail: String = jwtService.extractUsername(token)
 
         val userEntity = repository.findByEmail(userEmail)
@@ -29,8 +30,6 @@ class UserService(
 
         val resultDto = userMapper.toDto(newUserEntity)
 
-        resultDto.token = jwtService.generateToken(mutableMapOf(), newUserEntity)
-
-        return resultDto
+        return UserWithTokenDto(resultDto, jwtService.generateToken(mutableMapOf(), newUserEntity))
     }
 }

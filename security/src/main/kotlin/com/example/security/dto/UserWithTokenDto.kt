@@ -1,6 +1,6 @@
 package com.example.security.dto
 
-data class AuthResponseDto (
+data class UserWithTokenDto (
     var user: UserDto?,
     var token: String?
 )

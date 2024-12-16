@@ -1,6 +1,6 @@
 package com.example.security.service
 
-import com.example.security.dto.AuthResponseDto
+import com.example.security.dto.UserWithTokenDto
 import com.example.security.dto.AuthenticationCredentials
 import com.example.security.dto.UserDto
 import com.example.security.mapper.UserMapper
@@ -25,7 +25,7 @@ class AuthService(
     private val INIT_VECTOR = "your-init-vector"
 
     @Transactional
-    fun register(user: UserDto): AuthResponseDto {
+    fun register(user: UserDto): UserWithTokenDto {
         val userEntity = mapper.toEntity(user)
         //check if user not exists
         if (repository.findByEmail(user.email) != null) throw RuntimeException("User exists")
@@ -38,10 +38,10 @@ class AuthService(
 
         val token = jwtService.generateToken(mapOf(), repository.saveAndFlush(userEntity))
 
-        return AuthResponseDto(mapper.toDto(userEntity), token)
+        return UserWithTokenDto(mapper.toDto(userEntity), token)
     }
 
-    fun authenticate(auth: AuthenticationCredentials): AuthResponseDto {
+    fun authenticate(auth: AuthenticationCredentials): UserWithTokenDto {
         val user = repository.findByEmail(auth.username ?: throw IllegalArgumentException(""))
             ?: throw IllegalArgumentException("")
 
@@ -51,7 +51,7 @@ class AuthService(
                 user
             )
 
-            return AuthResponseDto(mapper.toDto(user), token)
+            return UserWithTokenDto(mapper.toDto(user), token)
         } else {
             throw RuntimeException("wrong password")
         }

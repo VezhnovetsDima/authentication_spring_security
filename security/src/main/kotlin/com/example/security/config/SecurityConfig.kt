@@ -74,6 +74,7 @@ class SecurityConfig(
         userRepository.saveAndFlush(userEntity)
 
         http
+            .csrf{ it.disable() }
             .authorizeHttpRequests { auth ->
                 auth
                     .requestMatchers("/auth/**").permitAll()
