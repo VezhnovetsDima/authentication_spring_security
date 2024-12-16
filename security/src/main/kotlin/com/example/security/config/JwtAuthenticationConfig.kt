@@ -5,7 +5,6 @@ import com.example.security.service.UserDetailsService
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import lombok.SneakyThrows
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetails
@@ -19,7 +18,6 @@ class JwtAuthenticationConfig(
     private val userDetailsService: UserDetailsService,
 ) : OncePerRequestFilter() {
 
-    @SneakyThrows
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,

@@ -1,5 +1,7 @@
 package com.example.security.service
 
+import com.example.security.exception.EmptyFieldException
+import com.example.security.exception.UserNotExistsException
 import com.example.security.repository.UserRepository
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -12,6 +14,6 @@ class UserDetailsService(
 ) : UserDetailsService {
 
     override fun loadUserByUsername(username: String?): UserDetails {
-        return repository.findByEmail(username ?: throw IllegalArgumentException("Empty Username")) ?: throw UsernameNotFoundException("Can't find user with Usename")
+        return repository.findByEmail(username ?: throw EmptyFieldException()) ?: throw UserNotExistsException("Can't find user with username UserDetailsService.loadUserByUsername()")
     }
 }

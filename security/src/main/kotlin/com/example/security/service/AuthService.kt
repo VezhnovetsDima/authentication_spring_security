@@ -3,6 +3,9 @@ package com.example.security.service
 import com.example.security.dto.UserWithTokenDto
 import com.example.security.dto.AuthenticationCredentials
 import com.example.security.dto.UserDto
+import com.example.security.exception.EmptyFieldException
+import com.example.security.exception.InvalidPasswordException
+import com.example.security.exception.UserNotExistsException
 import com.example.security.mapper.UserMapper
 import com.example.security.repository.RoleRepository
 import com.example.security.repository.UserRepository
@@ -42,8 +45,8 @@ class AuthService(
     }
 
     fun authenticate(auth: AuthenticationCredentials): UserWithTokenDto {
-        val user = repository.findByEmail(auth.username ?: throw IllegalArgumentException(""))
-            ?: throw IllegalArgumentException("")
+        val user = repository.findByEmail(auth.username ?: throw EmptyFieldException())
+            ?: throw UserNotExistsException("User with this email not exists AuthService.authenticate()")
 
         if (decrypt(user.encryptedPassword) == auth.password) {
             val token = jwtService.generateToken(
@@ -53,7 +56,7 @@ class AuthService(
 
             return UserWithTokenDto(mapper.toDto(user), token)
         } else {
-            throw RuntimeException("wrong password")
+            throw InvalidPasswordException()
         }
     }
 

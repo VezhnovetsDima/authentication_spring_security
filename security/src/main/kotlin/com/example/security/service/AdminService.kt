@@ -4,6 +4,9 @@ import com.example.security.dto.AuthenticationRole
 import com.example.security.dto.UserRolesDto
 import com.example.security.entity.RoleEntity
 import com.example.security.entity.UserEntity
+import com.example.security.exception.EmptyFieldException
+import com.example.security.exception.RoleNotExistsException
+import com.example.security.exception.UserNotExistsException
 import com.example.security.repository.RoleRepository
 import com.example.security.repository.UserRepository
 import jakarta.transaction.Transactional
@@ -43,11 +46,11 @@ class AdminService(
 
     @Transactional(Transactional.TxType.REQUIRES_NEW)
     private fun pair(auth: AuthenticationRole): Pair<UserEntity, RoleEntity> {
-        val user = userRepository.findByEmail(auth.username ?: throw IllegalArgumentException("field can't be null"))
-            ?: throw IllegalArgumentException("User with this email not exists")
+        val user = userRepository.findByEmail(auth.username ?: throw EmptyFieldException())
+            ?: throw UserNotExistsException("User with this email not exists AdminService.pair()")
 
-        val role = roleRepository.findByName(auth.setRole ?: throw IllegalArgumentException("field can't be null"))
-            ?: throw IllegalArgumentException("this role not exists")
+        val role = roleRepository.findByName(auth.setRole ?: throw EmptyFieldException())
+            ?: throw RoleNotExistsException("Role not exists  AdminService.pair()")
         return Pair(user, role)
     }
 }
